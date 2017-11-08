@@ -99,7 +99,7 @@ var app = new Vue({
           () => [
             h('div', {attrs: {class: 'current-rate'}}, [
               h('amount', {props: {amount: 1, currency: 'BTC'}}), ' = ',
-              h('amount', {props: {amount: this.rate, currency: 'EUR'}})
+              h('amount', {props: {amount: this.rate, currency: this.currency}})
             ])
           ]
         )
