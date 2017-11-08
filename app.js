@@ -11,27 +11,21 @@ Vue.component('amount', {
     options: function () {
       if (this.currency === 'BTC') {
         return {
-          style: "currency",
-          currency: this.currency,
-          currencyDisplay: "code",
           minimumFractionDigits: 0,
           maximumFractionDigits: 8
         };
       }
 
       return {
-        style: "currency",
-        currency: this.currency,
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-        currencyDisplay: "code"
+        maximumFractionDigits: 0
       };
     }
   },
   render: function (h) {
     return h(
       'span', {attrs: {'class': 'amount'}},
-      [this.amount.toLocaleString(navigator.languages, this.options)]);
+      [this.amount.toLocaleString(navigator.languages, this.options), ' ', this.currency]);
   }
 });
 
