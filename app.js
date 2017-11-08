@@ -67,7 +67,7 @@ var app = new Vue({
         .then(balance => this.balance = parseInt(balance, 10) / 100000000)
         .catch(error => {
           console.error('Failed to fetch balance:', error);
-          this.error = 'Failed to fetch balance.';
+          this.error = 'Failed to fetch balance. Please wait 10 seconds and try again.';
         })
         .then(() => console.debug('Done.'));
     }
@@ -149,5 +149,5 @@ fetch(
   "https://api.coinbase.com/v2/exchange-rates?currency=BTC"
 ).then(res => res.json()).then(json => app.rates = json.data.rates).catch(error => {
   console.error('Failed to fetch rates:', error);
-  app.error = 'Failed to fetch rates.';
+  app.error = 'Failed to fetch rates. Please try again.';
 });
