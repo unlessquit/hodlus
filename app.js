@@ -37,6 +37,7 @@ var app = new Vue({
     currency: 'USD',
     addresses: [],
     rates: null,
+    fetchingBalance: false,
     error: null
   },
   computed: {
@@ -62,6 +63,13 @@ var app = new Vue({
         return;
       }
 
+      var finished = false;
+
+      // Only show fetching spinner if it takes too long.
+      setTimeout(() => {
+        if (!finished) this.fetchingBalance = true;
+      }, 1000);
+
       fetch('https://blockchain.info/q/addressbalance/' + this.addresses.join('|') + '?cors=true')
         .then(r => r.text())
         .then(balance => this.balance = parseInt(balance, 10) / 100000000)
@@ -69,7 +77,11 @@ var app = new Vue({
           console.error('Failed to fetch balance:', error);
           this.error = 'Failed to fetch balance. Please wait 10 seconds and try again.';
         })
-        .then(() => console.debug('Done.'));
+        .then(() => {
+          finished = true;
+          this.fetchingBalance = false;
+          console.debug('Done.');
+        });
     }
   },
   render: function (h) {
@@ -80,12 +92,19 @@ var app = new Vue({
       ]);
     };
 
+    if (this.fetchingBalance) {
+      return h('center', [
+        h('h1', ['Fetching balance...']),
+        h('img', {attrs: {src: "img/fetching.svg"}})
+      ]);
+    }
+
     return h('center', [
       h('div', [
-        h('h1', ["You are hodling"]),
         when(
           this.balance !== null,
           () => [
+            h('h1', ["You are hodling"]),
             h('div', {attrs: {class: 'bitcoin-balance'}}, [
               h('amount', {props: {amount: this.balance, currency: 'BTC'}}),
               h('div', {attrs: {'class': 'addresses-count'}}, ['on ', this.addresses.length, this.addresses.length > 1 ? ' addresses' : ' address']),
