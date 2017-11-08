@@ -42,35 +42,50 @@ var app = new Vue({
     balance: null,
     currency: 'USD',
     addresses: [],
-    rates: null
+    rates: null,
+    error: null
   },
   computed: {
     rate: function () {
       return this.rates && parseInt(this.rates[this.currency], 10);
     },
     converted: function () {
-      console.log('converting');
+      console.debug('Converting.');
       if (this.balance === null) return null;
-      if (this.rates === null) return null;
+      if (this.rate === null) return null;
 
-      return Math.floor(this.balance * this.rates[this.currency]);
+      return Math.floor(this.balance * this.rate);
     }
   },
   watch: {
+    error: function () {
+      console.error(this.error);
+    },
     addresses: function () {
-      console.log('Fetching balance...');
+      console.debug('Fetching balance...');
       if (this.addresses.length === 0) {
         this.balance = 0;
         return;
       }
 
-      // TODO: handle error
-      fetch('https://blockchain.info/q/addressbalance/' + this.addresses.join('|'))
+      fetch('https://blockchain.info/q/addressbalance/' + this.addresses.join('|') + '?cors=true')
         .then(r => r.text())
-        .then(balance => this.balance = parseInt(balance, 10) / 100000000);
+        .then(balance => this.balance = parseInt(balance, 10) / 100000000)
+        .catch(error => {
+          console.error('Failed to fetch balance:', error);
+          this.error = 'Failed to fetch balance.';
+        })
+        .then(() => console.debug('Done.'));
     }
   },
   render: function (h) {
+    if (this.error) {
+      return h('center', [
+        h('h1', ['Error']),
+        h('div', [JSON.stringify(this.error)]),
+      ]);
+    };
+
     return h('center', [
       h('div', [
         h('h1', ["You are hodling"]),
@@ -138,4 +153,7 @@ window.onhashchange = function () {
 
 fetch(
   "https://api.coinbase.com/v2/exchange-rates?currency=BTC"
-).then(res => res.json()).then(json => app.rates = json.data.rates);
+).then(res => res.json()).then(json => app.rates = json.data.rates).catch(error => {
+  console.error('Failed to fetch rates:', error);
+  app.error = 'Failed to fetch rates.';
+});
