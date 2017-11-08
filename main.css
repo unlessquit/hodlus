@@ -1,0 +1,62 @@
+body {
+    background-color: #FAC90D;
+    font-family: 'Titillium Web', sans-serif;
+    color: white;
+    height: 100%;
+}
+
+#logo-corner {
+    position: fixed;
+    bottom: -32px;
+    left: 0;
+}
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+h1, h2 {
+    color: #076DCE;
+}
+
+h1 {
+    font-size: 36px;
+    font-weight: normal;
+    margin-bottom: 35px;
+    margin-top: 70px;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.addresses-count {
+    font-size: 10px;
+    color: #076DCE;
+}
+
+.bitcoin-balance {
+    margin-bottom: 35px;
+}
+
+.bitcoin-balance .amount {
+    font-size: 24px;
+    line-height: 26px;
+}
+
+em > .amount {
+    line-height: 48px;
+    font-size: 48px;
+    font-style: normal;
+}
+
+.current-rate {
+    position: fixed;
+    right: 10px;
+    bottom: 6px;
+    opacity: 0.65;
+    font-size: 20px;
+    line-height: 20px;
+}

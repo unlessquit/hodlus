@@ -14,6 +14,7 @@ Vue.component('amount', {
           style: "currency",
           currency: this.currency,
           currencyDisplay: "code",
+          minimumFractionDigits: 0,
           maximumFractionDigits: 8
         };
       }
@@ -21,12 +22,16 @@ Vue.component('amount', {
       return {
         style: "currency",
         currency: this.currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
         currencyDisplay: "code"
       };
     }
   },
   render: function (h) {
-    return h('div', [this.amount.toLocaleString(navigator.languages, this.options)]);
+    return h(
+      'span', {attrs: {'class': 'amount'}},
+      [this.amount.toLocaleString(navigator.languages, this.options)]);
   }
 });
 
@@ -35,11 +40,14 @@ var app = new Vue({
   data: {
     hash: '',
     balance: null,
-    currency: null,
+    currency: 'USD',
     addresses: [],
     rates: null
   },
   computed: {
+    rate: function () {
+      return this.rates && parseInt(this.rates[this.currency], 10);
+    },
     converted: function () {
       console.log('converting');
       if (this.balance === null) return null;
@@ -64,20 +72,38 @@ var app = new Vue({
   },
   render: function (h) {
     return h('center', [
-      h('h1', ["Balance"]),
-      when(
-        this.balance,
-        () => [
-          h('amount', {props: {amount: this.balance, currency: 'BTC'}})
-        ]
-      ),
-      when(
-        this.converted,
-        () => [
-          h('div', ['=']),
-          h('amount', {props: {amount: this.converted, currency: this.currency}})
-        ]
-      )
+      h('div', [
+        h('h1', ["You are hodling"]),
+        when(
+          this.balance !== null,
+          () => [
+            h('div', {attrs: {class: 'bitcoin-balance'}}, [
+              h('amount', {props: {amount: this.balance, currency: 'BTC'}}),
+              h('div', {attrs: {'class': 'addresses-count'}}, ['on ', this.addresses.length, this.addresses.length > 1 ? ' addresses' : ' address']),
+            ])
+          ]
+        ),
+        h('div', [
+          when(
+            this.converted,
+            () => [
+              h('h2', ['Which equals to']),
+              h('em', [
+                h('amount', {props: {amount: this.converted, currency: this.currency, primary: true}})
+              ])
+            ]
+          )
+        ]),
+        when(
+          this.rate,
+          () => [
+            h('div', {attrs: {class: 'current-rate'}}, [
+              h('amount', {props: {amount: 1, currency: 'BTC'}}), ' = ',
+              h('amount', {props: {amount: this.rate, currency: 'EUR'}})
+            ])
+          ]
+        )
+      ])
     ]);
   }
 });
