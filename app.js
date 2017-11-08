@@ -6,7 +6,7 @@ function when(bool, then) {
 }
 
 Vue.component("amount", {
-  props: ["amount", "currency"],
+  props: ["value", "currency"],
   computed: {
     options: function() {
       if (this.currency === "BTC") {
@@ -24,10 +24,51 @@ Vue.component("amount", {
   },
   render: function(h) {
     return h("span", { attrs: { class: "amount" } }, [
-      this.amount.toLocaleString(navigator.languages, this.options),
+      this.value.toLocaleString(navigator.languages, this.options),
       " ",
       this.currency
     ]);
+  }
+});
+
+Vue.component("animated-amount", {
+  props: ["value", "currency"],
+  data: function() {
+    return {
+      tweeningValue: 0
+    };
+  },
+  render: function(h) {
+    return h("amount", { props: { value: this.tweeningValue, currency: this.currency } });
+  },
+  watch: {
+    value: function(newValue, oldValue) {
+      this.tween(oldValue, newValue);
+    }
+  },
+  mounted: function() {
+    this.tween(0, this.value);
+  },
+  methods: {
+    tween: function(startValue, endValue) {
+      var vm = this;
+
+      function animate() {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      new TWEEN.Tween({tweeningValue: startValue})
+        .to({tweeningValue: endValue}, 3500)
+        .easing(TWEEN.Easing.Quintic.Out)
+        .onUpdate(function() {
+          vm.tweeningValue = this.tweeningValue;
+        })
+        .start();
+
+      animate();
+    }
   }
 });
 
@@ -111,7 +152,7 @@ var app = new Vue({
         when(this.balance !== null, () => [
           h("h1", ["You are hodling"]),
           h("div", { attrs: { class: "bitcoin-balance" } }, [
-            h("amount", { props: { amount: this.balance, currency: "BTC" } }),
+            h("amount", { props: { value: this.balance, currency: "BTC" } }),
             h("div", { attrs: { class: "addresses-count" } }, [
               "on ",
               this.addresses.length,
@@ -123,11 +164,10 @@ var app = new Vue({
           when(this.converted, () => [
             h("h2", ["Which equals to"]),
             h("em", [
-              h("amount", {
+              h("animated-amount", {
                 props: {
-                  amount: this.converted,
-                  currency: this.currency,
-                  primary: true
+                  value: this.converted,
+                  currency: this.currency
                 }
               })
             ])
@@ -135,10 +175,10 @@ var app = new Vue({
         ]),
         when(this.rate, () => [
           h("div", { attrs: { class: "current-rate" } }, [
-            h("amount", { props: { amount: 1, currency: "BTC" } }),
+            h("amount", { props: { value: 1, currency: "BTC" } }),
             " = ",
             h("amount", {
-              props: { amount: this.rate, currency: this.currency }
+              props: { value: this.rate, currency: this.currency }
             })
           ])
         ])
@@ -175,10 +215,18 @@ window.onhashchange = function() {
   processHash();
 };
 
-fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC")
-  .then(res => res.json())
-  .then(json => (app.rates = json.data.rates))
-  .catch(error => {
-    console.error("Failed to fetch rates:", error);
-    app.error = "Failed to fetch rates. Please try again.";
-  });
+function updateRates () {
+  console.log('Updating rates...');
+  fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC")
+    .then(res => res.json())
+    .then(json => (app.rates = json.data.rates))
+    .catch(error => {
+      console.error("Failed to fetch rates:", error);
+      if (!app.rates) {
+        app.error = "Failed to fetch rates. Please try again.";
+      }
+    })
+    .then(() => setTimeout(updateRates, 30000));
+}
+
+updateRates();
