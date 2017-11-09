@@ -2,7 +2,6 @@
   "short_name": "HODLus",
   "name": "HODLus - Your Bitcoin balance.",
   "icons": [],
-  "start_url": "/index.html",
   "display": "fullscreen",
   "orientation": "portrait"
 }
