@@ -201,8 +201,11 @@ var app = new Vue({
       return h("center", [h("h1", ["Error"]), h("div", ["No addresses."])]);
     }
 
-    if (this.fetchingBalance) {
-      return h("center", [h("h1", ["Fetching balance..."]), h("fetching...")]);
+    if (this.balance === null) {
+      if (this.fetchingBalance) {
+        return h("center", [h("h1", ["Fetching balance..."]), h("fetching...")]);
+      }
+      return h("div");
     }
 
     return h("center", [

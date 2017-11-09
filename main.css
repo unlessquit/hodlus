@@ -61,3 +61,13 @@ em > .amount {
     font-size: 20px;
     line-height: 20px;
 }
+
+img.settings {
+    width: 64px;
+    height: 64px;
+    opacity: 0.4;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    margin-left: -32px;
+}
