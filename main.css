@@ -70,8 +70,11 @@ img.settings {
     bottom: 80px;
     left: 50%;
     margin-left: -32px;
-    cursor: pointer;
     user-select: none;
+}
+
+img.settings:hover {
+    cursor: pointer;
 }
 
 .settings h1 {
