@@ -140,6 +140,13 @@ var app = new Vue({
       ]);
     }
 
+    if (this.addresses.length === 0) {
+      return h("center", [
+        h("h1", ["Error"]),
+        h("div", ["No addresses."])
+      ]);
+    }
+
     if (this.fetchingBalance) {
       return h("center", [
         h("h1", ["Fetching balance..."]),
