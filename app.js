@@ -129,10 +129,26 @@ Vue.component("hodling", {
   }
 });
 
+Vue.component("settings", {
+  props: ["addresses", "currency", "rates"],
+  render: function(h) {
+    return h("div", [
+      h("h1", ["Settings"]),
+      h("h2", ["Currency"]),
+      h("div", [
+        this.rates === null
+          ? h("fetching...")
+          : h('select', {on: {change: (e) => setPartValue('currency', e.target.value) }},
+              [Object.keys(this.rates).map(currency => h('option', {attrs: this.currency === currency ? {selected: true} : {}}, [currency]))])
+      ])
+    ]);
+  }
+});
+
 var app = new Vue({
   el: "#app",
   data: {
-    hash: "",
+    showSettings: "",
     balance: null,
     currency: "USD",
     addresses: [],
@@ -209,22 +225,40 @@ var app = new Vue({
     }
 
     return h("center", [
-      h("hodling", {
-        props: {
-          balance: this.balance,
-          addresses: this.addresses,
-          converted: this.converted,
-          currency: this.currency
-        }
-      }),
+      ifelse(
+        this.showSettings,
+        () => h("settings", {props: {addresses: this.addresses, currency: this.currency, rates: this.rates}}),
+        () => h("hodling", {
+          props: {
+            balance: this.balance,
+            addresses: this.addresses,
+            converted: this.converted,
+            currency: this.currency
+          }
+        })
+      ),
       when(this.rate, () => [
         h("current-price", {
           props: { price: this.rate, currency: this.currency }
         })
-      ])
+      ]),
+      h('img', {attrs: {src: "img/gear.svg", class: "settings"},
+                on: {click: () => this.toggleSettings()}})
     ]);
+  },
+  methods: {
+    toggleSettings: function () {
+      this.showSettings = !this.showSettings;
+    }
   }
 });
+
+function setPartValue(key, value) {
+  var parts = document.location.hash.substr(1).split(";");
+  var other = parts.filter(part => part.indexOf(key + ":") !== 0);
+
+  window.location.hash = other.join(';') + ';' + key + ':' + value;
+}
 
 function getPartValue(key, defaultValue) {
   var parts = document.location.hash.substr(1).split(";");
