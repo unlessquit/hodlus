@@ -223,13 +223,16 @@ Vue.component("settings", {
           props: { focus: true },
           on: { address: this.onCreate }
         }),
-        this.addresses.map(
-          address => h("address-input", {
-            key: address,
-            props: { address: address },
-            on: { delete: this.onDelete }
-          })
-        )
+        h('transition-group', {props: {'enter-active-class': 'animated fadeInDown',
+                                       'leave-active-class': 'animated fadeOut'}}, [
+          this.addresses.map(
+            address => h("address-input", {
+              key: address,
+              props: { address: address },
+              on: { delete: this.onDelete }
+            })
+          )
+        ])
       ])
     ]);
   },
