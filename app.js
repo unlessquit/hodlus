@@ -108,23 +108,8 @@ Vue.component("settings-button", {
   },
   methods: {
     animate: function () {
-      var el = this.$el;
-
-      function animate() {
-        if (TWEEN.update()) {
-          requestAnimationFrame(animate);
-        }
-      }
-
-      new TWEEN.Tween({ tweeningValue: 0 })
-        .to({ tweeningValue: 90 }, 500)
-        .easing(TWEEN.Easing.Quintic.Out)
-        .onUpdate(function() {
-          el.style.transform = "rotate(" + this.tweeningValue + "deg)";
-        })
-        .start();
-
-      animate();
+      this.$el.classList.add("spin");
+      this.$el.addEventListener("animationend", (e) => this.$el.classList.remove("spin"));
     },
     onClick: function () {
       this.animate();
