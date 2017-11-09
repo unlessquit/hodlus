@@ -322,7 +322,7 @@ var app = new Vue({
         })
       ]),
       h("img", {
-        attrs: { src: "img/gear.svg", class: "settings" },
+        attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
         on: { click: () => this.toggleSettings() }
       })
     ]);
