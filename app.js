@@ -278,18 +278,25 @@ var app = new Vue({
       ]);
     }
 
-    if (this.addresses.length === 0) {
-      return h("center", [h("h1", ["Error"]), h("div", ["No addresses."])]);
-    }
+    var settingsButton = h("img", {
+      attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
+      on: { click: () => this.toggleSettings() }
+    });
 
-    if (this.balance === null) {
-      if (this.fetchingBalance) {
-        return h("center", [
-          h("h1", ["Fetching balance..."]),
-          h("fetching...")
-        ]);
+    if (!this.showSettings) {
+      if (this.addresses.length === 0) {
+        return h("center", [h("h1", ["Configuration needed"]), "Use settings button below to configure HODLus.", settingsButton]);
       }
-      return h("div");
+
+      if (this.balance === null) {
+        if (this.fetchingBalance) {
+          return h("center", [
+            h("h1", ["Fetching balance..."]),
+            h("fetching...")
+          ]);
+        }
+        return h("div");
+      }
     }
 
     return h("center", [
@@ -318,10 +325,7 @@ var app = new Vue({
           props: { price: this.rate, currency: this.currency }
         })
       ]),
-      h("img", {
-        attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
-        on: { click: () => this.toggleSettings() }
-      })
+      settingsButton
     ]);
   },
   methods: {
