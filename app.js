@@ -255,11 +255,6 @@ var app = new Vue({
       console.error(this.error);
     },
     addresses: function() {
-      if (this.addresses.length === 0) {
-        this.balance = 0;
-        return;
-      }
-
       // We are on settings page, there is no need to fetch balance just yet.
       if (this.showSettings) return;
 
@@ -333,6 +328,11 @@ var app = new Vue({
       this.showSettings = !this.showSettings;
     },
     fetchBalance: function() {
+      if (this.addresses.length === 0) {
+        this.balance = 0;
+        return;
+      }
+
       console.debug("Fetching balance...");
 
       var finished = false;
