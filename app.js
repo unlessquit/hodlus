@@ -148,7 +148,7 @@ Vue.component("settings", {
 var app = new Vue({
   el: "#app",
   data: {
-    showSettings: "",
+    showSettings: false,
     balance: null,
     currency: "USD",
     addresses: [],
