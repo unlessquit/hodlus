@@ -386,7 +386,7 @@ function processHash() {
   app.currency = getPartValue("currency", "USD");
   var addressPart = getPartValue("address", "");
   if (addressPart !== prevAddressPart) {
-    app.addresses = getPartValue("address", "").split(",");
+    app.addresses = addressPart === "" ? [] : addressPart.split(",");
     prevAddressPart = addressPart;
   }
 }
