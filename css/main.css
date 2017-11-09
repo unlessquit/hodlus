@@ -3,6 +3,7 @@ body {
     font-family: 'Abel', sans-serif;
     color: white;
     height: 100%;
+    overflow: hidden;
 }
 
 #logo-corner {
