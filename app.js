@@ -198,20 +198,17 @@ Vue.component("settings", {
       ]),
       h("h2", ["Addresses"]),
       h("section", [
-        (this.newInput = h("div", [
-          (this.newInput = h("address-input", {
-            key: this.addresses.length + 1,
-            props: { focus: true },
-            on: { address: this.onCreate }
-          }))
-        ])),
-        this.addresses.map(address =>
-          h("div", { key: address }, [
-            h("address-input", {
-              props: { address: address },
-              on: { delete: this.onDelete }
-            })
-          ])
+        h("address-input", {
+          key: this.addresses.length + 1,
+          props: { focus: true },
+          on: { address: this.onCreate }
+        }),
+        this.addresses.map(
+          address => h("address-input", {
+            key: address,
+            props: { address: address },
+            on: { delete: this.onDelete }
+          })
         )
       ])
     ]);
