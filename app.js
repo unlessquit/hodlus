@@ -99,6 +99,41 @@ Vue.component("animated-amount", {
   }
 });
 
+Vue.component("settings-button", {
+  render: function(h) {
+    return h("img", {
+      attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
+      on: { click: this.onClick }
+    });
+  },
+  methods: {
+    animate: function () {
+      var el = this.$el;
+
+      function animate() {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      new TWEEN.Tween({ tweeningValue: 0 })
+        .to({ tweeningValue: 90 }, 500)
+        .easing(TWEEN.Easing.Quintic.Out)
+        .onUpdate(function() {
+          el.style.transform = "rotate(" + this.tweeningValue + "deg)";
+        })
+        .start();
+
+      animate();
+    },
+    onClick: function () {
+      this.animate();
+      this.$emit('click');
+    }
+  }
+});
+
+
 Vue.component("hodling", {
   props: ["balance", "addresses", "converted", "currency"],
   render: function(h) {
@@ -273,10 +308,7 @@ var app = new Vue({
       ]);
     }
 
-    var settingsButton = h("img", {
-      attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
-      on: { click: () => this.toggleSettings() }
-    });
+    var settingsButton = h("settings-button", { on: { click: () => this.toggleSettings() }});
 
     if (!this.showSettings) {
       if (this.addresses.length === 0) {
