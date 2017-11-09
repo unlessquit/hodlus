@@ -1,9 +1,32 @@
 /* eslint-env browser */
 /* global auth0, Auth0Lock, Vue, S2 */
 
-function when(bool, then) {
-  return bool ? then() : null;
+function ifelse(bool, thenFn, elseFn) {
+  return bool ? thenFn() : elseFn();
 }
+
+function when(bool, thenFn) {
+  return bool ? thenFn() : null;
+}
+
+Vue.component("fetching...", {
+  render: function(h) {
+    return h("img", { attrs: { src: "img/fetching.svg" } });
+  }
+});
+
+Vue.component("current-price", {
+  props: ["price", "currency"],
+  render: function(h) {
+    return h("div", { attrs: { class: "current-rate" } }, [
+      h("amount", { props: { value: 1, currency: "BTC" } }),
+      " = ",
+      h("amount", {
+        props: { value: this.price, currency: this.currency }
+      })
+    ]);
+  }
+});
 
 Vue.component("amount", {
   props: ["value", "currency"],
@@ -39,7 +62,9 @@ Vue.component("animated-amount", {
     };
   },
   render: function(h) {
-    return h("amount", { props: { value: this.tweeningValue, currency: this.currency } });
+    return h("amount", {
+      props: { value: this.tweeningValue, currency: this.currency }
+    });
   },
   watch: {
     value: function(newValue, oldValue) {
@@ -59,8 +84,8 @@ Vue.component("animated-amount", {
         }
       }
 
-      new TWEEN.Tween({tweeningValue: startValue})
-        .to({tweeningValue: endValue}, 3500)
+      new TWEEN.Tween({ tweeningValue: startValue })
+        .to({ tweeningValue: endValue }, 3500)
         .easing(TWEEN.Easing.Quintic.Out)
         .onUpdate(function() {
           vm.tweeningValue = this.tweeningValue;
@@ -69,6 +94,38 @@ Vue.component("animated-amount", {
 
       animate();
     }
+  }
+});
+
+Vue.component("hodling", {
+  props: ["balance", "addresses", "converted", "currency"],
+  render: function(h) {
+    return h("div", [
+      h("h1", ["You are hodling"]),
+      h("div", { attrs: { class: "bitcoin-balance" } }, [
+        h("amount", { props: { value: this.balance, currency: "BTC" } }),
+        h("div", { attrs: { class: "addresses-count" } }, [
+          "on ",
+          this.addresses.length,
+          this.addresses.length > 1 ? " addresses" : " address"
+        ])
+      ]),
+      h("div", [
+        h("h2", ["Which equals to"]),
+        ifelse(
+          this.converted === null,
+          () => h("fetching..."),
+          () => h("em", [
+            h("animated-amount", {
+              props: {
+                value: this.converted,
+                currency: this.currency
+              }
+            })
+          ])
+        )
+      ])
+    ]);
   }
 });
 
@@ -141,54 +198,26 @@ var app = new Vue({
     }
 
     if (this.addresses.length === 0) {
-      return h("center", [
-        h("h1", ["Error"]),
-        h("div", ["No addresses."])
-      ]);
+      return h("center", [h("h1", ["Error"]), h("div", ["No addresses."])]);
     }
 
     if (this.fetchingBalance) {
-      return h("center", [
-        h("h1", ["Fetching balance..."]),
-        h("img", { attrs: { src: "img/fetching.svg" } })
-      ]);
+      return h("center", [h("h1", ["Fetching balance..."]), h("fetching...")]);
     }
 
     return h("center", [
-      h("div", [
-        when(this.balance !== null, () => [
-          h("h1", ["You are hodling"]),
-          h("div", { attrs: { class: "bitcoin-balance" } }, [
-            h("amount", { props: { value: this.balance, currency: "BTC" } }),
-            h("div", { attrs: { class: "addresses-count" } }, [
-              "on ",
-              this.addresses.length,
-              this.addresses.length > 1 ? " addresses" : " address"
-            ])
-          ])
-        ]),
-        h("div", [
-          when(this.converted, () => [
-            h("h2", ["Which equals to"]),
-            h("em", [
-              h("animated-amount", {
-                props: {
-                  value: this.converted,
-                  currency: this.currency
-                }
-              })
-            ])
-          ])
-        ]),
-        when(this.rate, () => [
-          h("div", { attrs: { class: "current-rate" } }, [
-            h("amount", { props: { value: 1, currency: "BTC" } }),
-            " = ",
-            h("amount", {
-              props: { value: this.rate, currency: this.currency }
-            })
-          ])
-        ])
+      h("hodling", {
+        props: {
+          balance: this.balance,
+          addresses: this.addresses,
+          converted: this.converted,
+          currency: this.currency
+        }
+      }),
+      when(this.rate, () => [
+        h("current-price", {
+          props: { price: this.rate, currency: this.currency }
+        })
       ])
     ]);
   }
@@ -222,8 +251,8 @@ window.onhashchange = function() {
   processHash();
 };
 
-function updateRates () {
-  console.log('Updating rates...');
+function updateRates() {
+  console.log("Updating rates...");
   fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC")
     .then(res => res.json())
     .then(json => (app.rates = json.data.rates))
