@@ -71,6 +71,7 @@ img.settings {
     left: 50%;
     margin-left: -32px;
     cursor: pointer;
+    user-select: none;
 }
 
 .settings h1 {
