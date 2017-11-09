@@ -71,3 +71,16 @@ img.settings {
     left: 50%;
     margin-left: -32px;
 }
+
+.settings h1 {
+    margin-bottom: 12px;
+}
+
+.settings section {
+    margin-bottom: 20px;
+}
+
+input.address {
+    margin-bottom: 5px;
+    font-family: "Lucida Console", Monaco, monospace;
+}

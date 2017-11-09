@@ -1,6 +1,8 @@
 /* eslint-env browser */
 /* global auth0, Auth0Lock, Vue, S2 */
 
+var addressLength = 34;
+
 function ifelse(bool, thenFn, elseFn) {
   return bool ? thenFn() : elseFn();
 }
@@ -115,33 +117,116 @@ Vue.component("hodling", {
         ifelse(
           this.converted === null,
           () => h("fetching..."),
-          () => h("em", [
-            h("animated-amount", {
-              props: {
-                value: this.converted,
-                currency: this.currency
-              }
-            })
-          ])
+          () =>
+            h("em", [
+              h("animated-amount", {
+                props: {
+                  value: this.converted,
+                  currency: this.currency
+                }
+              })
+            ])
         )
       ])
     ]);
   }
 });
 
-Vue.component("settings", {
-  props: ["addresses", "currency", "rates"],
+Vue.component("address-input", {
+  props: ["address", "focus"],
   render: function(h) {
     return h("div", [
+      this.input = h("input", {
+        attrs: {
+          value: this.address,
+          size: addressLength,
+          class: "address"
+        },
+        on: { input: this.onInput }
+      })
+    ]);
+  },
+  mounted: function() {
+    if (this.focus) {
+      this.input.elm.focus();
+    }
+  },
+  methods: {
+    onInput: function(e) {
+      var value = e.target.value.trim();
+      if (value.length === addressLength) {
+        this.$emit("address", { address: value });
+      }
+
+      if (value.length === 0) {
+        this.$emit("delete", { address: this.address });
+      }
+    }
+  }
+});
+
+Vue.component("settings", {
+  props: ["addresses", "currency", "rates"],
+  computed: {
+    currencies: function() {
+      return Object.keys(this.rates);
+    }
+  },
+  render: function(h) {
+    return h("div", { attrs: { class: "settings" } }, [
       h("h1", ["Settings"]),
       h("h2", ["Currency"]),
-      h("div", [
+      h("section", [
         this.rates === null
           ? h("fetching...")
-          : h('select', {on: {change: (e) => setPartValue('currency', e.target.value) }},
-              [Object.keys(this.rates).map(currency => h('option', {attrs: this.currency === currency ? {selected: true} : {}}, [currency]))])
+          : h(
+              "select",
+              { on: { change: e => setPartValue("currency", e.target.value) } },
+              [
+                this.currencies.map(currency =>
+                  h(
+                    "option",
+                    {
+                      attrs:
+                        this.currency === currency ? { selected: true } : {}
+                    },
+                    [currency]
+                  )
+                )
+              ]
+            )
+      ]),
+      h("h2", ["Addresses"]),
+      h("section", [
+        (this.newInput = h("div", [
+          (this.newInput = h("address-input", {
+            key: this.addresses.length + 1,
+            props: { focus: true },
+            on: { address: this.onCreate }
+          }))
+        ])),
+        this.addresses.map(address =>
+          h("div", { key: address }, [
+            h("address-input", {
+              props: { address: address },
+              on: { delete: this.onDelete }
+            })
+          ])
+        )
       ])
     ]);
+  },
+  methods: {
+    onDelete: function(e) {
+      console.debug("Deleted:", e.address);
+      setPartValue(
+        "address",
+        this.addresses.filter(a => a !== e.address).join(",")
+      );
+    },
+    onCreate: function(e) {
+      setPartValue("address", [e.address].concat(this.addresses).join(","));
+    }
   }
 });
 
@@ -173,11 +258,81 @@ var app = new Vue({
       console.error(this.error);
     },
     addresses: function() {
-      console.debug("Fetching balance...");
       if (this.addresses.length === 0) {
         this.balance = 0;
         return;
       }
+
+      // We are on settings page, there is no need to fetch balance just yet.
+      if (this.showSettings) return;
+
+      this.fetchBalance();
+    },
+    showSettings: function(x) {
+      // We are back from settings screen, fetch balance.
+      if (!this.showSettings) this.fetchBalance();
+    }
+  },
+  render: function(h) {
+    if (this.error) {
+      return h("center", [
+        h("h1", ["Error"]),
+        h("div", [JSON.stringify(this.error)])
+      ]);
+    }
+
+    if (this.addresses.length === 0) {
+      return h("center", [h("h1", ["Error"]), h("div", ["No addresses."])]);
+    }
+
+    if (this.balance === null) {
+      if (this.fetchingBalance) {
+        return h("center", [
+          h("h1", ["Fetching balance..."]),
+          h("fetching...")
+        ]);
+      }
+      return h("div");
+    }
+
+    return h("center", [
+      ifelse(
+        this.showSettings,
+        () =>
+          h("settings", {
+            props: {
+              addresses: this.addresses,
+              currency: this.currency,
+              rates: this.rates
+            }
+          }),
+        () =>
+          h("hodling", {
+            props: {
+              balance: this.balance,
+              addresses: this.addresses,
+              converted: this.converted,
+              currency: this.currency
+            }
+          })
+      ),
+      when(this.rate, () => [
+        h("current-price", {
+          props: { price: this.rate, currency: this.currency }
+        })
+      ]),
+      h("img", {
+        attrs: { src: "img/gear.svg", class: "settings" },
+        on: { click: () => this.toggleSettings() }
+      })
+    ]);
+  },
+  methods: {
+    toggleSettings: function() {
+      this.showSettings = !this.showSettings;
+    },
+    fetchBalance: function() {
+      console.debug("Fetching balance...");
 
       var finished = false;
 
@@ -195,60 +350,16 @@ var app = new Vue({
         .then(balance => (this.balance = parseInt(balance, 10) / 100000000))
         .catch(error => {
           console.error("Failed to fetch balance:", error);
-          this.error =
-            "Failed to fetch balance. Please wait 10 seconds and try again.";
+          if (this.balance === null) {
+            this.error =
+              "Failed to fetch balance. Please wait 10 seconds and try again.";
+          }
         })
         .then(() => {
           finished = true;
           this.fetchingBalance = false;
           console.debug("Done.");
         });
-    }
-  },
-  render: function(h) {
-    if (this.error) {
-      return h("center", [
-        h("h1", ["Error"]),
-        h("div", [JSON.stringify(this.error)])
-      ]);
-    }
-
-    if (this.addresses.length === 0) {
-      return h("center", [h("h1", ["Error"]), h("div", ["No addresses."])]);
-    }
-
-    if (this.balance === null) {
-      if (this.fetchingBalance) {
-        return h("center", [h("h1", ["Fetching balance..."]), h("fetching...")]);
-      }
-      return h("div");
-    }
-
-    return h("center", [
-      ifelse(
-        this.showSettings,
-        () => h("settings", {props: {addresses: this.addresses, currency: this.currency, rates: this.rates}}),
-        () => h("hodling", {
-          props: {
-            balance: this.balance,
-            addresses: this.addresses,
-            converted: this.converted,
-            currency: this.currency
-          }
-        })
-      ),
-      when(this.rate, () => [
-        h("current-price", {
-          props: { price: this.rate, currency: this.currency }
-        })
-      ]),
-      h('img', {attrs: {src: "img/gear.svg", class: "settings"},
-                on: {click: () => this.toggleSettings()}})
-    ]);
-  },
-  methods: {
-    toggleSettings: function () {
-      this.showSettings = !this.showSettings;
     }
   }
 });
@@ -257,7 +368,7 @@ function setPartValue(key, value) {
   var parts = document.location.hash.substr(1).split(";");
   var other = parts.filter(part => part.indexOf(key + ":") !== 0);
 
-  window.location.hash = other.join(';') + ';' + key + ':' + value;
+  window.location.hash = other.join(";") + ";" + key + ":" + value;
 }
 
 function getPartValue(key, defaultValue) {
@@ -289,7 +400,7 @@ window.onhashchange = function() {
 };
 
 function updateRates() {
-  console.log("Updating rates...");
+  console.debug("Updating rates...");
   fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC")
     .then(res => res.json())
     .then(json => (app.rates = json.data.rates))
