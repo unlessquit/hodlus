@@ -1,7 +1,13 @@
 {
   "short_name": "HODLus",
   "name": "HODLus - Your Bitcoin balance.",
-  "icons": [],
+  "icons": [
+    {
+      "src": "img/launcher-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
   "display": "fullscreen",
   "orientation": "portrait"
 }
