@@ -15,10 +15,17 @@ function sat2btc(x) {
   return x / 100000000.0;
 }
 
+function uniq(xs) {
+  return xs.reduce((acc, x) => {
+    if (acc.indexOf(x) === -1) acc.push(x);
+    return acc;
+  }, []);
+}
+
 function fetchBalanceBlockchainInfo(addresses) {
   return fetch(
     "https://blockchain.info/q/addressbalance/" +
-      addresses.join("|") +
+      uniq(addresses).join("|") +
       "?cors=true"
   )
     .then(r => r.text())
@@ -28,7 +35,7 @@ function fetchBalanceBlockchainInfo(addresses) {
 }
 
 function fetchBalanceBlockexplorer(addresses) {
-  var requests = addresses.map(address =>
+  var requests = uniq(addresses).map(address =>
     fetch("https://blockexplorer.com/api/addr/" + address + "/balance")
       .then(r => r.text())
       .then(balance => sat2btc(balance))
@@ -210,6 +217,7 @@ Vue.component("address-input", {
     onInput: function(e) {
       var value = e.target.value.trim();
       if (value.length === addressLength) {
+        e.target.value = '';
         this.$emit("address", { address: value });
       }
 
@@ -288,7 +296,8 @@ Vue.component("settings", {
       );
     },
     onCreate: function(e) {
-      setPartValue("address", [e.address].concat(this.addresses).join(","));
+      var addresses = uniq([e.address].concat(this.addresses));
+      setPartValue("address", addresses.join(","));
     }
   }
 });
@@ -456,7 +465,8 @@ function processHash() {
   app.currency = getPartValue("currency", "USD");
   var addressPart = getPartValue("address", "");
   if (addressPart !== prevAddressPart) {
-    app.addresses = addressPart === "" ? [] : addressPart.split(",");
+    var addresses = addressPart === "" ? [] : addressPart.split(",");
+    app.addresses = uniq(addresses);
     prevAddressPart = addressPart;
   }
 }
