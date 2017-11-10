@@ -131,22 +131,28 @@ Vue.component("animated-amount", {
 Vue.component("settings-button", {
   render: function(h) {
     return h("img", {
-      attrs: { src: "img/gear.svg", class: "settings", alt: "Settings", title: "Settings" },
+      attrs: {
+        src: "img/gear.svg",
+        class: "settings",
+        alt: "Settings",
+        title: "Settings"
+      },
       on: { click: this.onClick }
     });
   },
   methods: {
-    animate: function () {
+    animate: function() {
       this.$el.classList.add("spin");
-      this.$el.addEventListener("animationend", (e) => this.$el.classList.remove("spin"));
+      this.$el.addEventListener("animationend", e =>
+        this.$el.classList.remove("spin")
+      );
     },
-    onClick: function () {
+    onClick: function() {
       this.animate();
-      this.$emit('click');
+      this.$emit("click");
     }
   }
 });
-
 
 Vue.component("hodling", {
   props: ["balance", "addresses", "converted", "currency"],
@@ -185,14 +191,14 @@ Vue.component("address-input", {
   props: ["address", "focus"],
   render: function(h) {
     return h("div", [
-      this.input = h("input", {
+      (this.input = h("input", {
         attrs: {
           value: this.address,
           size: addressLength,
           class: "address"
         },
         on: { input: this.onInput }
-      })
+      }))
     ]);
   },
   mounted: function() {
@@ -252,16 +258,24 @@ Vue.component("settings", {
           props: { focus: true },
           on: { address: this.onCreate }
         }),
-        h('transition-group', {props: {'enter-active-class': 'animated fadeInDown',
-                                       'leave-active-class': 'animated fadeOut'}}, [
-          this.addresses.map(
-            address => h("address-input", {
-              key: address,
-              props: { address: address },
-              on: { delete: this.onDelete }
-            })
-          )
-        ])
+        h(
+          "transition-group",
+          {
+            props: {
+              "enter-active-class": "animated fadeInDown",
+              "leave-active-class": "animated fadeOut"
+            }
+          },
+          [
+            this.addresses.map(address =>
+              h("address-input", {
+                key: address,
+                props: { address: address },
+                on: { delete: this.onDelete }
+              })
+            )
+          ]
+        )
       ])
     ]);
   },
@@ -325,11 +339,17 @@ var app = new Vue({
       ]);
     }
 
-    var settingsButton = h("settings-button", { on: { click: () => this.toggleSettings() }});
+    var settingsButton = h("settings-button", {
+      on: { click: () => this.toggleSettings() }
+    });
 
     if (!this.showSettings) {
       if (this.addresses.length === 0) {
-        return h("center", [h("h1", ["Configuration needed"]), "Use settings button below to configure HODLus.", settingsButton]);
+        return h("center", [
+          h("h1", ["Configuration needed"]),
+          "Use settings button below to configure HODLus.",
+          settingsButton
+        ]);
       }
 
       if (this.balance === null) {
