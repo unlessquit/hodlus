@@ -11,6 +11,35 @@ function when(bool, thenFn) {
   return bool ? thenFn() : null;
 }
 
+function sat2btc(x) {
+  return x / 100000000.0;
+}
+
+function fetchBalanceBlockchainInfo(addresses) {
+  return fetch(
+    "https://blockchain.info/q/addressbalance/" +
+      addresses.join("|") +
+      "?cors=true"
+  )
+    .then(r => r.text())
+    .then(balance => {
+      return { total: sat2btc(parseInt(balance, 10)) };
+    });
+}
+
+function fetchBalanceBlockexplorer(addresses) {
+  var requests = addresses.map(address =>
+    fetch("https://blockexplorer.com/api/addr/" + address + "/balance")
+      .then(r => r.text())
+      .then(balance => sat2btc(balance))
+  );
+
+  return Promise.all(requests).then(balances => {
+    var total = balances.reduce((total, balance) => total + balance);
+    return { total: total };
+  });
+}
+
 Vue.component("fetching...", {
   render: function(h) {
     return h("img", { attrs: { src: "img/fetching.svg" } });
@@ -362,13 +391,13 @@ var app = new Vue({
         if (!finished) this.fetchingBalance = true;
       }, 1000);
 
-      fetch(
-        "https://blockchain.info/q/addressbalance/" +
-          this.addresses.join("|") +
-          "?cors=true"
-      )
-        .then(r => r.text())
-        .then(balance => (this.balance = parseInt(balance, 10) / 100000000))
+      fetchBalanceBlockexplorer(this.addresses)
+        .then(result => {
+          this.balance = result.total;
+          finished = true;
+          this.fetchingBalance = false;
+          console.debug("Done.");
+        })
         .catch(error => {
           console.error("Failed to fetch balance:", error);
           if (this.balance === null) {
