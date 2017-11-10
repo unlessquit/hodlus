@@ -64,6 +64,7 @@ em > .amount {
     opacity: 0.65;
     font-size: 20px;
     line-height: 20px;
+    z-index: -1;
 }
 
 img.settings {
