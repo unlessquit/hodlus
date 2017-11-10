@@ -31,13 +31,13 @@ h1 {
 }
 
 h2 {
-    font-size: 18px;
+    font-size: 26px;
     font-weight: normal;
     margin-bottom: 3px;
 }
 
 .addresses-count {
-    font-size: 10px;
+    font-size: 18px;
     color: #076DCE;
 }
 
@@ -46,13 +46,13 @@ h2 {
 }
 
 .bitcoin-balance .amount {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 30px;
+    line-height: 38px;
 }
 
 em > .amount {
-    line-height: 48px;
-    font-size: 48px;
+    line-height: 56px;
+    font-size: 56px;
     font-style: normal;
 }
 
