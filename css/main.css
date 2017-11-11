@@ -118,12 +118,11 @@ section.addresses {
     display: inline-flex;
     border: 1px solid white;
     margin: 5px;
-    width: 150px;
+    width: 180px;
 }
 
 .address .delete {
     margin-left: 5px;
-    width: 50px;
     border: 0px;
     border-radius: 0;
     background-color: white;
