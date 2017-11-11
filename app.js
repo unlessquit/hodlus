@@ -199,7 +199,7 @@ Vue.component("hodling", {
               })
             ]),
             when(this.roi, () => [
-              h("div", {attrs: {class: this.roi < 0 ? "loss" : "profit"}}, [
+              h("div", {attrs: {class: "roi " + (this.roi < 0 ? "loss" : "profit")}}, [
                 h("small", [
                   this.roi < 0 ? null : "+",
                   h("animated-amount", {

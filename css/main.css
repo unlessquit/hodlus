@@ -60,6 +60,10 @@ em > .amount {
     font-style: normal;
 }
 
+.roi small {
+    font-size: 18px;
+}
+
 .profit {
     color: white;
 }
