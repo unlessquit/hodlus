@@ -484,6 +484,7 @@ function getPartValue(key, defaultValue) {
 
 var prevAddressPart = "";
 function processHash() {
+  localStorage.setItem("hash", document.location.hash);
   app.currency = getPartValue("currency", "USD");
   var addressPart = getPartValue("address", "");
   if (addressPart !== prevAddressPart) {
@@ -493,13 +494,18 @@ function processHash() {
   }
 }
 
-if (document.location.hash) {
-  processHash();
-}
-
 window.onhashchange = function() {
   processHash();
 };
+
+var storedHash = window.localStorage && localStorage.getItem("hash");
+
+if (document.location.hash) {
+  processHash();
+}
+else if (storedHash) {
+  window.location.hash = localStorage.getItem("hash");
+}
 
 function updateRates() {
   console.debug("Updating rates...");
