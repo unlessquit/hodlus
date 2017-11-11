@@ -67,8 +67,7 @@ em > .amount {
 }
 
 img.settings {
-    width: 64px;
-    height: 64px;
+    width: 40px;
     opacity: 0.4;
     position: fixed;
     right: 10px;
