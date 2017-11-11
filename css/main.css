@@ -89,9 +89,57 @@ img.settings:hover {
     margin-bottom: 20px;
 }
 
-input.address {
-    margin-bottom: 5px;
+.settings select {
+    height: 25px;
+}
+
+div.new-address {
     font-family: "Lucida Console", Monaco, monospace;
+}
+
+input.address {
+    padding: 5px;
+    font-size: 12px;
+    margin-bottom: 5px;
+    width: 34em;
+}
+
+section.addresses {
+    width: 50%;
+}
+
+@media (max-width: 900px) {
+    section.addresses {
+        width: 85%;
+    }
+}
+
+.address {
+    display: inline-flex;
+    border: 1px solid white;
+    margin: 5px;
+    width: 150px;
+}
+
+.address .delete {
+    margin-left: 5px;
+    width: 50px;
+    border: 0px;
+    border-radius: 0;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.address-number {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 5px;
+}
+
+.delete img {
+    margin: 7px;
 }
 
 .spin {

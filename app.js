@@ -197,12 +197,14 @@ Vue.component("hodling", {
 Vue.component("address-input", {
   props: ["address", "focus"],
   render: function(h) {
-    return h("div", [
+    return h("div", { attrs: { class: "new-address" } }, [
       (this.input = h("input", {
         attrs: {
           value: this.address,
-          size: addressLength,
-          class: "address"
+          maxlength: addressLength,
+          class: "address",
+          placeholder:
+            "Enter address (e.g., 1EHNa6Q4Jz2uvNExL497mE43ikXhwF6kZm)"
         },
         on: { input: this.onInput }
       }))
@@ -217,13 +219,35 @@ Vue.component("address-input", {
     onInput: function(e) {
       var value = e.target.value.trim();
       if (value.length === addressLength) {
-        e.target.value = '';
+        e.target.value = "";
         this.$emit("address", { address: value });
       }
 
       if (value.length === 0) {
         this.$emit("delete", { address: this.address });
       }
+    }
+  }
+});
+
+Vue.component("address-item", {
+  props: ["address"],
+  render: function(h) {
+    return h("div", { attrs: { class: "address" } }, [
+      h("span", { attrs: { class: "address-number" } }, [this.address]),
+      h(
+        "div",
+        {
+          attrs: { class: "delete" },
+          on: { click: this.onDelete }
+        },
+        [h("img", { attrs: { src: "img/x.svg" } })]
+      )
+    ]);
+  },
+  methods: {
+    onDelete: function(e) {
+      this.$emit("delete", { address: this.address });
     }
   }
 });
@@ -260,7 +284,7 @@ Vue.component("settings", {
             )
       ]),
       h("h2", ["Addresses"]),
-      h("section", [
+      h("section", { attrs: { class: "addresses" } }, [
         h("address-input", {
           key: this.addresses.length + 1,
           props: { focus: true },
@@ -270,19 +294,17 @@ Vue.component("settings", {
           "transition-group",
           {
             props: {
-              "enter-active-class": "animated fadeInDown",
-              "leave-active-class": "animated fadeOut"
+              "enter-active-class": "animated zoomIn",
+              "leave-active-class": "animated zoomOut"
             }
           },
-          [
-            this.addresses.map(address =>
-              h("address-input", {
-                key: address,
-                props: { address: address },
-                on: { delete: this.onDelete }
-              })
-            )
-          ]
+          this.addresses.map(address =>
+            h("address-item", {
+              key: address,
+              props: { address: address },
+              on: { delete: this.onDelete }
+            })
+          )
         )
       ])
     ]);
