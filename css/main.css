@@ -60,6 +60,14 @@ em > .amount {
     font-style: normal;
 }
 
+.profit {
+    color: white;
+}
+
+.loss {
+    color: #F06820;
+}
+
 .current-rate {
     position: fixed;
     right: 10px;

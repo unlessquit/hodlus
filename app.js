@@ -165,7 +165,14 @@ Vue.component("settings-button", {
 });
 
 Vue.component("hodling", {
-  props: ["balance", "addresses", "converted", "currency"],
+  props: ["balance", "addresses", "converted", "currency", "invested"],
+  computed: {
+    roi: function() {
+      if (!this.invested) return null;
+      if (!this.converted) return null;
+      return this.converted - this.invested;
+    }
+  },
   render: function(h) {
     return h("div", [
       h("h1", ["You are hodling"]),
@@ -182,7 +189,7 @@ Vue.component("hodling", {
         ifelse(
           this.converted === null,
           () => h("fetching..."),
-          () =>
+          () => [
             h("em", [
               h("animated-amount", {
                 props: {
@@ -190,8 +197,22 @@ Vue.component("hodling", {
                   currency: this.currency
                 }
               })
+            ]),
+            when(this.roi, () => [
+              h("div", {attrs: {class: this.roi < 0 ? "loss" : "profit"}}, [
+                h("small", [
+                  this.roi < 0 ? null : "+",
+                  h("animated-amount", {
+                    props: {
+                      value: this.roi,
+                      currency: this.currency
+                    }
+                  })
+                ])
+              ])
             ])
-        )
+          ]
+        ),
       ])
     ]);
   }
@@ -340,6 +361,7 @@ var app = new Vue({
     showSettings: false,
     balance: null,
     currency: "USD",
+    invested: null,
     addresses: [],
     rates: null,
     fetchingBalance: false,
@@ -421,7 +443,8 @@ var app = new Vue({
               balance: this.balance,
               addresses: this.addresses,
               converted: this.converted,
-              currency: this.currency
+              currency: this.currency,
+              invested: this.invested
             }
           })
       ),
@@ -496,6 +519,7 @@ var prevAddressPart = "";
 function processHash() {
   localStorage.setItem("hash", document.location.hash);
   app.currency = getPartValue("currency", "USD");
+  app.invested = parseInt(getPartValue("invested", 0), 10);
   var addressPart = getPartValue("address", "");
   if (addressPart !== prevAddressPart) {
     var addresses = addressPart === "" ? [] : addressPart.split(",");
