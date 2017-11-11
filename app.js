@@ -222,10 +222,6 @@ Vue.component("address-input", {
         e.target.value = "";
         this.$emit("address", { address: value });
       }
-
-      if (value.length === 0) {
-        this.$emit("delete", { address: this.address });
-      }
     }
   }
 });
