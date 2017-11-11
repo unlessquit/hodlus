@@ -8,6 +8,7 @@
       "type": "image/png"
     }
   ],
+  "background_color": "#FAC90D",
   "display": "fullscreen",
   "orientation": "portrait"
 }
