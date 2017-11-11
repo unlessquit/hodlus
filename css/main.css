@@ -103,8 +103,7 @@ input.address {
     padding: 5px;
     font-size: 12px;
     margin-bottom: 5px;
-    min-width: 350px;
-    max-width: 90%;
+    width: 240px;
 }
 
 section.addresses {
@@ -121,7 +120,7 @@ section.addresses {
     display: inline-flex;
     border: 1px solid white;
     margin: 5px;
-    width: 140px;
+    width: 240px;
 }
 
 .address .delete {
