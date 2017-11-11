@@ -19,6 +19,10 @@ body {
     margin: 0px;
 }
 
+center {
+    background-color: #FAC90D;
+}
+
 h1, h2 {
     color: #076DCE;
 }
