@@ -125,7 +125,6 @@ section.addresses {
 }
 
 .address .delete {
-    color: black;
     font-weight: 600;
     text-transform: uppercase;
     margin-left: 5px;
@@ -137,6 +136,12 @@ section.addresses {
     align-items: center;
     cursor: pointer;
     padding: 0 5px 0 5px;
+    border-left: 1px solid white;
+}
+
+.address .delete-confirm {
+    color: white;
+    background-color: #F06820;
 }
 
 .address-number {

@@ -242,7 +242,7 @@ Vue.component("address-item", {
       h(
         "div",
         {
-          attrs: { class: "delete" },
+          attrs: { class: "delete" + (this.deleting ? " delete-confirm" : "") },
           on: { click: this.onDelete }
         },
         [this.deleting ? "Delete?" : h("img", { attrs: { src: "img/x.svg" } })]
