@@ -388,7 +388,7 @@ var app = new Vue({
       if (this.addresses.length === 0) {
         return h("center", [
           h("h1", ["Configuration needed"]),
-          "Use settings button below to configure HODLus.",
+          "Use settings button in top right corner to configure HODLus.",
           settingsButton
         ]);
       }

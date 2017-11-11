@@ -71,9 +71,8 @@ img.settings {
     height: 64px;
     opacity: 0.4;
     position: fixed;
-    bottom: 80px;
-    left: 50%;
-    margin-left: -32px;
+    right: 10px;
+    top: 10px;
     user-select: none;
 }
 
