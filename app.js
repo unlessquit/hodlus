@@ -228,6 +228,11 @@ Vue.component("address-input", {
 
 Vue.component("address-item", {
   props: ["address"],
+  data: function () {
+    return {
+      deleting: false
+    };
+  },
   render: function(h) {
     return h("div", { attrs: { class: "address" } }, [
       h("span", { attrs: { class: "address-number" } }, [this.address]),
@@ -237,12 +242,18 @@ Vue.component("address-item", {
           attrs: { class: "delete" },
           on: { click: this.onDelete }
         },
-        [h("img", { attrs: { src: "img/x.svg" } })]
+        [this.deleting ? "Delete?" : h("img", { attrs: { src: "img/x.svg" } })]
       )
     ]);
   },
   methods: {
     onDelete: function(e) {
+      if (!this.deleting) {
+        this.deleting = true;
+        setTimeout(() => this.deleting = false, 5000);
+        return;
+      }
+
       this.$emit("delete", { address: this.address });
     }
   }

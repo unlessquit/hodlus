@@ -122,13 +122,18 @@ section.addresses {
 }
 
 .address .delete {
+    color: black;
+    font-weight: 600;
+    text-transform: uppercase;
     margin-left: 5px;
     border: 0px;
     border-radius: 0;
     background-color: white;
     display: flex;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
+    padding: 0 5px 0 5px;
 }
 
 .address-number {
