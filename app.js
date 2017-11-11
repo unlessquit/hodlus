@@ -47,6 +47,9 @@ function fetchBalanceBlockexplorer(addresses) {
   });
 }
 
+var fetchBalanceProvider = fetchBalanceBlockexplorer;
+// var fetchBalanceProvider = fetchBalanceBlockchainInfo;
+
 Vue.component("fetching...", {
   render: function(h) {
     return h("img", { attrs: { src: "img/fetching.svg" } });
@@ -449,7 +452,7 @@ var app = new Vue({
         if (!finished) this.fetchingBalance = true;
       }, 1000);
 
-      fetchBalanceBlockexplorer(this.addresses)
+      fetchBalanceProvider(this.addresses)
         .then(result => {
           this.balance = result.total;
           finished = true;
