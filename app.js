@@ -164,6 +164,38 @@ Vue.component("settings-button", {
   }
 });
 
+Vue.component("roi", {
+  props: ["converted", "currency", "invested"],
+  computed: {
+    roi: function() {
+      if (!this.invested) return null;
+      if (!this.converted) return null;
+      return this.converted - this.invested;
+    }
+  },
+  render: function(h) {
+    if (this.roi === null) return null;
+
+    var hasProfit = this.roi >= 0;
+
+    return h(
+      "div",
+      { attrs: { class: "roi " + (hasProfit ? "profit" : "loss") } },
+      [
+        h("small", [
+          hasProfit < 0 ? "+" : null,
+          h("animated-amount", {
+            props: {
+              value: this.roi,
+              currency: this.currency
+            }
+          })
+        ])
+      ]
+    );
+  }
+});
+
 Vue.component("hodling", {
   props: ["balance", "addresses", "converted", "currency", "invested"],
   computed: {
@@ -198,21 +230,15 @@ Vue.component("hodling", {
                 }
               })
             ]),
-            when(this.roi, () => [
-              h("div", {attrs: {class: "roi " + (this.roi < 0 ? "loss" : "profit")}}, [
-                h("small", [
-                  this.roi < 0 ? null : "+",
-                  h("animated-amount", {
-                    props: {
-                      value: this.roi,
-                      currency: this.currency
-                    }
-                  })
-                ])
-              ])
-            ])
+            h("roi", {
+              props: {
+                converted: this.converted,
+                currency: this.currency,
+                invested: this.invested
+              }
+            })
           ]
-        ),
+        )
       ])
     ]);
   }
