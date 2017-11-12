@@ -278,7 +278,7 @@ Vue.component("address-input", {
 
 Vue.component("address-item", {
   props: ["address"],
-  data: function () {
+  data: function() {
     return {
       deleting: false
     };
@@ -300,7 +300,7 @@ Vue.component("address-item", {
     onDelete: function(e) {
       if (!this.deleting) {
         this.deleting = true;
-        setTimeout(() => this.deleting = false, 5000);
+        setTimeout(() => (this.deleting = false), 5000);
         return;
       }
 
@@ -562,8 +562,7 @@ var storedHash = window.localStorage && localStorage.getItem("hash");
 
 if (document.location.hash) {
   processHash();
-}
-else if (storedHash) {
+} else if (storedHash) {
   window.location.hash = localStorage.getItem("hash");
 }
 
