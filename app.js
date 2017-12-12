@@ -47,8 +47,8 @@ function fetchBalanceBlockexplorer(addresses) {
   });
 }
 
-var fetchBalanceProvider = fetchBalanceBlockexplorer;
-// var fetchBalanceProvider = fetchBalanceBlockchainInfo;
+// var fetchBalanceProvider = fetchBalanceBlockexplorer;
+var fetchBalanceProvider = fetchBalanceBlockchainInfo;
 
 Vue.component("fetching...", {
   render: function(h) {
