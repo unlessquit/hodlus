@@ -47,8 +47,23 @@ function fetchBalanceBlockexplorer(addresses) {
   });
 }
 
+function fetchBalanceBitaps(addresses) {
+  var requests = uniq(addresses).map(
+    address =>
+      fetch("https://bitaps.com/api/address/" + address)
+      .then(r => r.json())
+      .then(info => sat2btc(info.balance))
+  );
+
+  return Promise.all(requests).then(balances => {
+    var total = balances.reduce((total, balance) => total + balance);
+    return { total: total };
+  });
+}
+
+var fetchBalanceProvider = fetchBalanceBitaps;
 // var fetchBalanceProvider = fetchBalanceBlockexplorer;
-var fetchBalanceProvider = fetchBalanceBlockchainInfo;
+// var fetchBalanceProvider = fetchBalanceBlockchainInfo;
 
 Vue.component("fetching...", {
   render: function(h) {
